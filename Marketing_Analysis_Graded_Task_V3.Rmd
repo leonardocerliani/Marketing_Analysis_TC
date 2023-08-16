@@ -536,7 +536,7 @@ Overall, the campaigns did not appear to benefit revenues.
 A few other potentially interesting plots which were used during the EDA for the presented analysis.
 
 
-## TTP and revenues per day on- and off-campaign 
+## Revenues and orders per day on- and off-campaign 
 
 ```{r daily_n_orders_revenues}
 
