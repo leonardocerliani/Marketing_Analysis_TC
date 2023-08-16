@@ -1,5 +1,7 @@
 # lcerli-ABP.2
 
+# Analysis of marketing campaign performance
+
 Analysis of marketing campaign performance on the data from the [Google Merchandise Store](https://shop.googlemerchandisestore.com/) in the period between 2020-11-01 and 2021-01-30.
 
 [Analysis report](https://tc-marketing-analysis.netlify.app/) -  which will be used for the presentation
