@@ -15,7 +15,7 @@ All the material can be downloaded from the [Github repo](https://github.com/leo
 # SQL query construction
 
 ## Identifying sessions
-The database does not contain an unequivocal information about the start and the end of a session, therefore we had to devise a suitable procedure for the existing data. In brief:
+The database does not contain unequivocal information about the start and the end of a session, therefore we had to devise a suitable procedure for the existing data. In brief:
 
 - The session_start event was chosen to define the start of the session. Within the same day, different events with `event_name="session_start"` were assigned a rank according to their timestamp
 - Every other event before the next session_start was labelled with this rank
