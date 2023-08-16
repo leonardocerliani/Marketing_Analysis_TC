@@ -2,8 +2,8 @@
 	Obtain session time and revenue (if any) for each user, day, session and campaign (if any).
 
 	Session time is calculated as the amount of seconds from each session_start in a day to the 
-  last event before the next session_start. Events before the first session_start in a day 
-  refer to sessions started the day before, and are not considered.
+    last event before the next session_start. Events before the first session_start in a day 
+    refer to sessions started the day before, and are not considered.
 
 	LC 15-08-2023
 */
