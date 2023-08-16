@@ -129,6 +129,7 @@ At the same time, we decided to run the main analysis - and report the results -
 
 - the median length for a session with a purchase is ~ 19 minutes
 - in a previous product analysis, we saw an increase in order value up to 30-60 minutes max
+- a threshold of 60' includes 80% of all sessions
 
 These reasons are based on the fact that we are interested in assessing the association between session length and revenue. Note however that from the previous product analysis it appeared that session length generally is not a strong predictor of total revenue.
 
