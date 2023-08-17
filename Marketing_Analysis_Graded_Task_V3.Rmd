@@ -31,6 +31,8 @@ library(ggstatsplot)
 library(viridis)
 library(ggpubr)
 library(htmltools)
+library(ggpubr)
+
 # library(dlookr)
 
 
@@ -264,25 +266,41 @@ ggplotly(gg, tooltip = "text", config = list(displayModeBar = FALSE))
 
 ```{r prop_test}
 
+# Wednesday
+prop_Thu <- ddf %>% 
+ filter(weekday_name == "Wed") %>% 
+ rename(n_converted = n) %>% 
+ ungroup() %>% 
+ select(n_converted, total) %>% 
+ arrange(total)
+
+cat("Wednesday")
+prop.test(x = prop_Thu$n_converted, n = prop_Thu$total, alternative = "greater")
+
+
+
 # Thursday
 prop_Thu <- ddf %>% 
  filter(weekday_name == "Thu") %>% 
  rename(n_converted = n) %>% 
  ungroup() %>% 
- select(n_converted, total)
+ select(n_converted, total) %>% 
+ arrange(total)
 
-
-prop.test(x = prop_Thu$n_converted, n = prop_Thu$total, alternative = "less")
+cat("Thursday")
+prop.test(x = prop_Thu$n_converted, n = prop_Thu$total, alternative = "greater")
 
 # Friday
 prop_Fri <- ddf %>% 
  filter(weekday_name == "Fri") %>% 
  rename(n_converted = n) %>% 
  ungroup() %>% 
- select(n_converted, total)
+ select(n_converted, total) %>% 
+ arrange(total)
 
 
-prop.test(x = prop_Fri$n_converted, n = prop_Fri$total, alternative = "less")
+cat("Friday")
+prop.test(x = prop_Fri$n_converted, n = prop_Fri$total, alternative = "greater")
 
 ```
 
@@ -290,15 +308,56 @@ prop.test(x = prop_Fri$n_converted, n = prop_Fri$total, alternative = "less")
 
 
 
-## Session length does not differ {.tabset}
+## Session length differ, but not in an interesting way {.tabset}
+
+**Campaign sessions and purchase sessions (either on- or off-campaign) are significantly slighltly longer** (up to 5 minutes) **, however there is no interaction between campaign and session type (browse-only or purchasing)**
 
 Sessions during campaign sessions are slightly longer each day of the week, although the median value is associated with high variability.
 
-What is interesting is that on Saturday the _purchasing_ campaign sessions are on average much shorter than the sessions not related to a campaign. However, a closer inspection shows that these are just 4 purchasing events, which makes a statistical comparison meaningless.
+On Saturday the _purchasing_ campaign session is on average much shorter than the sessions not related to a campaign. However, a closer inspection shows that these are just 4 purchasing events, which makes a statistical comparison meaningless.
+
+
+### Session time by conversion and campaign
+
+NB: Boxplots show session time in seconds, however anova2 was run on log(session_time) to approximate normally distributed values.
+
+```{r}
+ddf <- df %>% 
+ select(TTP, campaign, purchase_session) %>%
+ mutate(logTTP = log(TTP)) %>% 
+ mutate(campaign = fct_rev(campaign))
+
+# # Table
+# ddf %>%
+#  group_by(campaign, purchase_session) %>%
+#  reframe(mean_TTP = mean(TTP))
+
+
+ddf %>% 
+ select(logTTP, campaign, purchase_session) %>% 
+ ggboxplot(
+  x = "purchase_session", y = "logTTP", color = "campaign"
+ ) +
+ scale_y_continuous(trans = "exp", labels = function(x)(round(exp(x)))) +
+ labs(
+  title = "Difference in session length",
+  subtitle = "for purchase/browse-only during and off campaign",
+  y = "Session length in seconds",
+  x = "Is purchase session"
+ )
+
+anova2 <- aov(formula = logTTP ~ campaign * purchase_session, data = ddf)
+cat("Session time is higher for campaign and purchase, but there is no interaction")
+summary(anova2)
+
+# plot(anova2)
+# car::Anova(anova2, type = "III")
+
+```
 
 
 
-### TTP during or outside a campaign
+### Session length during or outside a campaign
 
 ```{r session_length_overall}
 
@@ -340,10 +399,9 @@ plot_session_length(
  title = "Overall session length in- and outside campaign"
 )
 
-
 ```
 
-### Purchasing sessions
+### Session length for Purchasing sessions (TTP)
 
 ```{r purchasing_session_length}
 
@@ -371,6 +429,18 @@ plot_session_length(
 #
 # ddf %>% filter(campaign == "YES")
 
+
+# # The following carries out an anova TTP ~ weekday * campaign
+# # There are no significant differences
+# ddf <- df %>% 
+#  filter(purchase_session == "YES") %>% 
+#  select(TTP, campaign, weekday_name) %>% 
+#  mutate(logTTP = log(TTP))
+# 
+# anova2 <- aov(TTP ~ campaign * weekday_name, data = ddf)
+# summary(anova2)
+# car::Anova(anova2, type = "III")
+
 ```
 
 ### Browse-only sessions (no purchase)
@@ -390,7 +460,7 @@ plot_session_length(
 
 **The highest revenues for campaign-related orders were generated at mid-week**, while they were much lower during the weekend and on Monday.
 
-There are also differences in the median amount order between campaign and no-campaign sessions in some days, however none of them is statistically significant.
+There are also differences in the median amount order between campaign and no-campaign sessions in some days, however not more than what could be expected by chance.
 
 
 ### Total revenue due to campaigns
@@ -443,6 +513,24 @@ df %>%
 ggplotly(gg) %>%
  layout(yaxis = list(range = c(0, 140))) %>% 
  layout(boxmode = "group")
+
+
+
+ddf <- df %>% 
+ filter(purchase_session == "YES") %>% 
+ select(revenue, weekday_name, campaign) %>% 
+ mutate(log_revenue = log(revenue))
+
+
+
+# # Anova 2 : revenue ~ weekday_name * campaign
+# # No significant difference. 
+# anova2 <- aov(log_revenue ~ weekday_name * campaign, data = ddf)
+# summary(anova2)
+# # Note that revenues are log-normally distributed
+# # however this has no effect on the anova2
+# df$revenue[df$revenue > 0] %>% log() %>% hist
+
 
 ```
 
