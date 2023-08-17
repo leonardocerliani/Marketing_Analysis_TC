@@ -310,9 +310,9 @@ prop.test(x = prop_Fri$n_converted, n = prop_Fri$total, alternative = "greater")
 
 ## Session length differ, but not in an interesting way {.tabset}
 
-**Campaign sessions and purchase sessions (either on- or off-campaign) are significantly slighltly longer** (up to 5 minutes) **, however there is no interaction between campaign and session type (browse-only or purchasing)**
+**Campaign sessions and purchase sessions (either on- or off-campaign) are significantly slighltly longer** (up to 5 minutes) **, however there is no interaction between campaign and session type (browse-only or purchasing)**. For instance, it is _not_ the case that campaign sessions are longer for purchase and shorter for browse-only with respect to no-campaign sessions.
 
-Sessions during campaign sessions are slightly longer each day of the week, although the median value is associated with high variability.
+As expected from the previous anova, **campaign sessions are slightly longer each day of the week**, although the median value is associated with high variability.
 
 On Saturday the _purchasing_ campaign session is on average much shorter than the sessions not related to a campaign. However, a closer inspection shows that these are just 4 purchasing events, which makes a statistical comparison meaningless.
 
@@ -460,7 +460,7 @@ plot_session_length(
 
 **The highest revenues for campaign-related orders were generated at mid-week**, while they were much lower during the weekend and on Monday.
 
-There are also differences in the median amount order between campaign and no-campaign sessions in some days, however not more than what could be expected by chance.
+There are also differences in the median amount order between campaign and no-campaign sessions in some days, however not more than what could be expected by chance (assessed with an anova2).
 
 
 ### Total revenue due to campaigns
@@ -515,21 +515,21 @@ ggplotly(gg) %>%
  layout(boxmode = "group")
 
 
+# Anova 2 : revenue ~ weekday_name * campaign
+# No significant difference.
 
 ddf <- df %>% 
  filter(purchase_session == "YES") %>% 
  select(revenue, weekday_name, campaign) %>% 
  mutate(log_revenue = log(revenue))
 
+cat("No significant effect of of mean log_revenue or campaign")
 
-
-# # Anova 2 : revenue ~ weekday_name * campaign
-# # No significant difference. 
-# anova2 <- aov(log_revenue ~ weekday_name * campaign, data = ddf)
-# summary(anova2)
-# # Note that revenues are log-normally distributed
-# # however this has no effect on the anova2
-# df$revenue[df$revenue > 0] %>% log() %>% hist
+anova2 <- aov(log_revenue ~ weekday_name * campaign, data = ddf)
+summary(anova2)
+# Note that revenues are log-normally distributed
+# however this has no effect on the anova2
+df$revenue[df$revenue > 0] %>% log() %>% hist(main = "Log(revenue)")
 
 
 ```
